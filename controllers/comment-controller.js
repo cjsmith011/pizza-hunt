@@ -1,4 +1,6 @@
+const res = require('express/lib/response');
 const { Comment, Pizza } = require('../public/models');
+const { db } = require('../public/models/Comment');
 
 const commentController = {
     //add comment to pizza
@@ -21,7 +23,23 @@ const commentController = {
         })
         .catch(err => res.json(err));
     },
-    
+    //this will add a reply to a comment
+    addReply({ params, body }, res) {
+      Comment.findOneAndUpdate(
+        { _id: params.commentId },
+        { $push: { replies: body } },
+        { new: true }
+      )
+      .then(dbPizzaData => {
+        if (!dbPizzaData) {
+          res.status(404).json({ message: 'Sorry, no pizza for that one!' });
+          return;
+        }
+        res.json(dbPizzaData);
+      })
+      .catch(err => res.json(err));
+    },
+   
     //remove comment
     removeComment({ params }, res) {
         Comment.findOneAndDelete({ _id: params.commentId })
@@ -44,6 +62,16 @@ const commentController = {
           })
           .catch(err => res.json(err));
       },
+       //this will remove a reply from a comment
+    removeReply({ params }, res) {
+      Comment.findOneAndUpdate(
+        { _id: params.commentId },
+        { $pull: { replies: { replyId: params.replyId } } },
+      { new: true }
+      )
+    .then(dbPizzaData => res.json(dbPizzaData))
+    .catch(err => res.json(err));
+  },
     }
 
 

@@ -4,12 +4,12 @@ const getPizzaList = () => {
   fetch('/api/pizzas')
   .then(response => response.json())
   .then(pizzaListArr => {
-    pizzaListArr.array.forEach(printPizza);
+    pizzaListArr.forEach(printPizza);
       
     })
     .catch(err => {
       console.log(err);
-    })
+    });
   };
 
 const printPizza = ({ _id, pizzaName, toppings, size, commentCount, createdBy, createdAt }) => {
